@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 
-const repo = process.argv[2] || "AetherGamesOfficial/AetherStatic";
+const repo = process.argv[2] || "AetherGamesOfficial/AetherEducationStatic";
 const cdnBase = `https://cdn.jsdelivr.net/gh/${repo}@main/`;
 const buildStamp = "favicon-refresh-20260721";
 const pages = ["studyhub", "enrichment", "resources", "research", "settings", "loading"];
