@@ -2,6 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 
 const repo = process.argv[2] || "AetherGamesOfficial/AetherStatic";
 const cdnBase = `https://cdn.jsdelivr.net/gh/${repo}@main/`;
+const buildStamp = "favicon-refresh-20260721";
 const pages = ["studyhub", "enrichment", "resources", "research", "settings", "loading"];
 const navPages = "studyhub|enrichment|resources|research|settings";
 const shellBackground = `${cdnBase}aether%20background.png`;
@@ -50,6 +51,7 @@ function svgDocument(title, html) {
 	const payload = Buffer.from(html).toString("base64");
 
 	return `<?xml version="1.0" encoding="UTF-8"?>
+<!-- ${buildStamp} -->
 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="position:fixed;inset:0;width:100%;height:100%;display:block;margin:0;padding:0;background:#121212 url('${shellBackground}') center / cover no-repeat;">
   <title>${title}</title>
   <style>
