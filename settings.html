@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AETHER Settings</title>
-    <link rel="icon" id="favicon" href="">
+    <link rel="icon" id="favicon" type="image/png" href="aether-logo.png">
     <style>
         :root {
             --panel: rgba(0, 0, 0, 0.35);
@@ -95,12 +95,11 @@
 
         .title {
             margin: 0 0 28px;
-            width: min(460px, 74vw);
-            height: auto;
-            display: block;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
-            justify-self: center;
-            user-select: none;
+            font-size: clamp(48px, 8vw, 98px);
+            line-height: 0.9;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            letter-spacing: 0;
         }
 
         .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
@@ -185,7 +184,7 @@
     </nav>
 
     <main class="page">
-        <img class="title" src="aether-logo.png" alt="AETHER">
+        <h1 class="title">SETTINGS</h1>
         <section class="grid">
             <div class="panel">
                 <h2>Look</h2>

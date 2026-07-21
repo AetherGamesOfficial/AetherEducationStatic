@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Activities</title>
+    <link rel="icon" type="image/png" href="aether-logo.png">
     <script src="https://cdn.jsdelivr.net/gh/luminsdk/script@latest/lumin.min.js"></script>
 
     <style>
@@ -76,11 +77,10 @@
 
         .activities-title {
             margin: 0;
-            width: min(320px, 42vw);
-            height: auto;
-            display: block;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
-            user-select: none;
+            color: #ffffff;
+            font-size: 42px;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
         }
 
         .activity-actions {
@@ -485,7 +485,7 @@
             }
 
             .activities-title {
-                width: min(260px, 70vw);
+                font-size: 34px;
             }
         }
     
@@ -599,7 +599,7 @@
 
     <main class="activities-shell">
         <header class="activities-header">
-            <img class="activities-title" src="aether-logo.png" alt="AETHER">
+            <h1 class="activities-title">ACTIVITIES</h1>
             <div class="activity-actions">
                 <input class="activity-input" id="game-search" type="text" placeholder="Search games..." autocomplete="off">
                 <select class="activity-select" id="category-filter">

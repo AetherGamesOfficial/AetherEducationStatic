@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>AETHER</title>
+    <link rel="icon" type="image/png" href="aether-logo.png">
     <style>
         html, body {
             margin: 0;
@@ -346,18 +348,18 @@
 
         .Aetherlogo {
             transition: all 0.9s ease;
-            width: min(620px, 72vw);
-            height: auto;
-            display: block;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); 
+            color: #ffffff; 
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 150px;
             margin: 0;
             z-index: 10;
-            user-select: none;
         }
 
         .Aetherlogo:hover {
             transform: scale(1.1);
-            filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.9));
+            color: #ffffff;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.9);
         }
 
         .bubble-container {
@@ -455,7 +457,7 @@
         </button>
     </nav>
 
-    <img class="Aetherlogo" src="aether-logo.png" alt="AETHER">
+    <h1 class="Aetherlogo">AETHER</h1>
     
     <div class="button-wrapper">
         <button class="Medeviscool" onclick="window.location.href='enrichment.html'">g@m3s</button>
