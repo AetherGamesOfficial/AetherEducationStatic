@@ -330,10 +330,10 @@
 
         .tools-title {
             margin: 0;
-            color: #ffffff;
-            font-size: 90px;
-            line-height: 1;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            width: min(420px, 72vw);
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
             user-select: none;
         }
 
@@ -406,7 +406,7 @@
             }
 
             .tools-title {
-                font-size: 48px;
+                width: min(320px, 78vw);
             }
 
             .tool-tabs {
@@ -510,7 +510,7 @@
     </nav>
 
     <main class="tools-shell">
-        <h1 class="tools-title">TOOLS</h1>
+        <img class="tools-title" src="aether-logo.png" alt="AETHER">
         <div class="tool-tabs">
             <button class="tool-tab" data-url="https://flixmomo.com">movies</button>
             <button class="tool-tab" data-url="https://youtube.com">youtube</button>

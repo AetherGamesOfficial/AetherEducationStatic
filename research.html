@@ -398,11 +398,11 @@
         }
 
         .research-logo {
-            font-size: 90px;
-            color: white;
+            width: min(520px, 78vw);
+            height: auto;
+            display: block;
             margin-bottom: 30px;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-            font-weight: bold;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
             user-select: none;
         }
 
@@ -586,7 +586,7 @@
 
         <div class="search-container" id="landing-ui">
 
-            <h1 class="research-logo">AETHER</h1>
+            <img class="research-logo" src="aether-logo.png" alt="AETHER">
 
             <form id="uv-form" onsubmit="return false">
                 <input

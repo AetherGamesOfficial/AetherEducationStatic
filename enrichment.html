@@ -76,10 +76,11 @@
 
         .activities-title {
             margin: 0;
-            color: #ffffff;
-            font-size: 42px;
-            line-height: 1;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            width: min(320px, 42vw);
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+            user-select: none;
         }
 
         .activity-actions {
@@ -484,7 +485,7 @@
             }
 
             .activities-title {
-                font-size: 34px;
+                width: min(260px, 70vw);
             }
         }
     
@@ -598,7 +599,7 @@
 
     <main class="activities-shell">
         <header class="activities-header">
-            <h1 class="activities-title">ACTIVITIES</h1>
+            <img class="activities-title" src="aether-logo.png" alt="AETHER">
             <div class="activity-actions">
                 <input class="activity-input" id="game-search" type="text" placeholder="Search games..." autocomplete="off">
                 <select class="activity-select" id="category-filter">

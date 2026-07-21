@@ -5,6 +5,7 @@ const cdnBase = `https://cdn.jsdelivr.net/gh/${repo}@main/`;
 const pages = ["studyhub", "enrichment", "resources", "research", "settings", "loading"];
 const navPages = "studyhub|enrichment|resources|research|settings";
 const shellBackground = `${cdnBase}aether%20background.png`;
+const logoImage = `${cdnBase}aether-logo.png`;
 
 function toStaticLink(page, attrs, content) {
 	return `<a${attrs} href="${cdnBase}${page}.svg" target="_parent">${content}</a>`;
@@ -13,6 +14,7 @@ function toStaticLink(page, attrs, content) {
 function convertStaticPaths(html) {
 	let converted = html
 		.replace(/aether background\.png/g, shellBackground)
+		.replace(/aether-logo\.png/g, logoImage)
 		.replace(/\s*<script src="page-loader\.js"><\/script>/g, "")
 		.replace(/src="search\.js"/g, `src="${cdnBase}search.js"`);
 
