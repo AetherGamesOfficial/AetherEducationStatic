@@ -628,7 +628,8 @@
         let luminTotalGames = 0;
         const luminPageLimit = 200;
         const luminDirectoryCacheKey = "aether:lumin-directory:v2";
-        const gnMathZonesUrls = [
+        const isStaticSvgPage = window.location.protocol === "data:" || window.location.origin === "null";
+const gnMathZonesUrls = [
             "https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json",
             "https://raw.githubusercontent.com/gn-math/assets/main/zones.json"
         ];
@@ -981,7 +982,11 @@
             }
 
             if (game.url) {
-                window.location.href = `research.html?goto=${encodeURIComponent(game.url)}`;
+                if (isStaticSvgPage) {
+                    window.open(game.url, "_blank", "noopener");
+                } else {
+                    window.location.href = `research.html?goto=${encodeURIComponent(game.url)}`;
+                }
                 return;
             }
 
@@ -1069,6 +1074,26 @@
         }
 
         async function initActivities() {
+            if (isStaticSvgPage) {
+                try {
+                    setStatus("Loading GN Math games...");
+                    allGames = await loadGnMathGames();
+                    if (!allGames.length) {
+                        allGames = fallbackGames;
+                    }
+                    await loadImages(allGames.slice(0, 36));
+                    updateCategories(categoriesFromGames(allGames));
+                    refreshGames();
+                } catch (err) {
+                    console.error("Static game catalog failed:", err);
+                    allGames = fallbackGames;
+                    await loadImages(allGames.slice(0, 36));
+                    updateCategories(categoriesFromGames(allGames));
+                    refreshGames();
+                }
+                return;
+            }
+
             const cachedDirectory = getCachedLuminDirectory();
             if (cachedDirectory) {
                 allGames = cachedDirectory.games;
@@ -1167,7 +1192,22 @@
     </script>
 <script>
 (() => {
-    const store = window.localStorage;
+    function createAetherStore() {
+    const memory = new Map();
+    try {
+        const key = "__aether_storage_test__";
+        window.localStorage.setItem(key, "1");
+        window.localStorage.removeItem(key);
+        return window.localStorage;
+    } catch {
+        return {
+            getItem: (key) => memory.has(key) ? memory.get(key) : null,
+            setItem: (key, value) => { memory.set(key, String(value)); },
+            removeItem: (key) => { memory.delete(key); }
+        };
+    }
+}
+const store = createAetherStore();
     const bgMap = {
         default: '#121212 url("aether background.png") center / cover fixed no-repeat',
         night: 'linear-gradient(135deg, #050505, #122033 58%, #12051f) fixed',

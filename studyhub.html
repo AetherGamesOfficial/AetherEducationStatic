@@ -481,7 +481,22 @@
     <script src="search.js" defer></script>
 <script>
 (() => {
-    const store = window.localStorage;
+    function createAetherStore() {
+    const memory = new Map();
+    try {
+        const key = "__aether_storage_test__";
+        window.localStorage.setItem(key, "1");
+        window.localStorage.removeItem(key);
+        return window.localStorage;
+    } catch {
+        return {
+            getItem: (key) => memory.has(key) ? memory.get(key) : null,
+            setItem: (key, value) => { memory.set(key, String(value)); },
+            removeItem: (key) => { memory.delete(key); }
+        };
+    }
+}
+const store = createAetherStore();
     const bgMap = {
         default: '#121212 url("aether background.png") center / cover fixed no-repeat',
         night: 'linear-gradient(135deg, #050505, #122033 58%, #12051f) fixed',

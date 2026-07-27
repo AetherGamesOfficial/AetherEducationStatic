@@ -678,6 +678,7 @@ function initAetherResearch() {
     let scramjetReadyPromise = null;
     let scramjetController = null;
     let loadToken = 0;
+    const isStaticSvgPage = window.location.protocol === "data:" || window.location.origin === "null";
 
     /* =========================
         FORMAT URL
@@ -860,8 +861,10 @@ function initAetherResearch() {
             }
         }
 
-        if (removedLegacyWorker && !sessionStorage.getItem(cleanupKey)) {
-            sessionStorage.setItem(cleanupKey, "true");
+        let didClean = false;
+        try { didClean = sessionStorage.getItem(cleanupKey) === "true"; } catch { didClean = false; }
+        if (removedLegacyWorker && !didClean) {
+            try { sessionStorage.setItem(cleanupKey, "true"); } catch {}
             await Promise.all([
                 caches.delete("__dynamic$files"),
                 caches.delete("__dynamic$blob"),
@@ -923,6 +926,10 @@ function initAetherResearch() {
     }
 
     async function prepareScramjetOnce() {
+        if (isStaticSvgPage) {
+            throw new Error("Static CDN pages cannot start the research worker. Open the server-hosted Aether page for proxy search.");
+        }
+
         await withTimeout(
             removeLegacyServiceWorkers(),
             2500,
@@ -1028,9 +1035,11 @@ function initAetherResearch() {
     });
 
     const params = new URL(window.location.href).searchParams;
-    const goto = params.get("goto") || sessionStorage.getItem(toolTargetKey);
+    let storedGoto = "";
+    try { storedGoto = sessionStorage.getItem(toolTargetKey) || ""; } catch { storedGoto = ""; }
+    const goto = params.get("goto") || storedGoto;
     if (goto) {
-        sessionStorage.removeItem(toolTargetKey);
+        try { try { sessionStorage.removeItem(toolTargetKey); } catch {} } catch {}
         address.value = goto;
         window.history.replaceState(null, "", window.location.pathname);
         loadAddress();
@@ -1046,7 +1055,22 @@ if (document.readyState === "loading") {
 </script>
 <script>
 (() => {
-    const store = window.localStorage;
+    function createAetherStore() {
+    const memory = new Map();
+    try {
+        const key = "__aether_storage_test__";
+        window.localStorage.setItem(key, "1");
+        window.localStorage.removeItem(key);
+        return window.localStorage;
+    } catch {
+        return {
+            getItem: (key) => memory.has(key) ? memory.get(key) : null,
+            setItem: (key, value) => { memory.set(key, String(value)); },
+            removeItem: (key) => { memory.delete(key); }
+        };
+    }
+}
+const store = createAetherStore();
     const bgMap = {
         default: '#121212 url("aether background.png") center / cover fixed no-repeat',
         night: 'linear-gradient(135deg, #050505, #122033 58%, #12051f) fixed',

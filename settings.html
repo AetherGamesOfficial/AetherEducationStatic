@@ -236,7 +236,22 @@
         <div class="bubble" style="--start-x:68%;--drift-x:60px;--size:28px;--speed:14s;--delay:.8s;--max-opacity:0.6;--color:#00f5d4"></div>
     </div>
 
-    <script>const store = window.localStorage;const bgMap = {
+    <script>function createAetherStore() {
+    const memory = new Map();
+    try {
+        const key = "__aether_storage_test__";
+        window.localStorage.setItem(key, "1");
+        window.localStorage.removeItem(key);
+        return window.localStorage;
+    } catch {
+        return {
+            getItem: (key) => memory.has(key) ? memory.get(key) : null,
+            setItem: (key, value) => { memory.set(key, String(value)); },
+            removeItem: (key) => { memory.delete(key); }
+        };
+    }
+}
+const store = createAetherStore();const bgMap = {
 default: '#121212 url("aether background.png") center / cover fixed no-repeat',
 night: 'linear-gradient(135deg, #050505, #122033 58%, #12051f) fixed',
 ocean: 'linear-gradient(135deg, #001219, #005f73, #0a9396) fixed',
@@ -455,13 +470,13 @@ type:"text/html"
 );
 
 
-};function setCloak(name){const cloak =cloaks[name];if(!cloak) return;document.title =cloak.title;document.getElementById("favicon").href =cloak.icon;localStorage.setItem("aether.cloak",name
+};function setCloak(name){const cloak =cloaks[name];if(!cloak) return;document.title =cloak.title;document.getElementById("favicon").href =cloak.icon;store.setItem("aether.cloak",name
 );
 
 
 }document.getElementById("cloakSelect").onchange=function(){setCloak(this.value);
 
-};const saved =localStorage.getItem("aether.cloak"
+};const saved =store.getItem("aether.cloak"
 );if(saved){setCloak(saved);
 
 }</script>

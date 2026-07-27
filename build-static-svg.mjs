@@ -17,6 +17,7 @@ function convertStaticPaths(html) {
 		.replace(/aether background\.png/g, shellBackground)
 		.replace(/aether-favicon\.png/g, faviconImage)
 		.replace(/\s*<script src="page-loader\.js"><\/script>/g, "")
+		.replace(/\s*<script src="\/bootstrap-init\.js"><\/script>/g, "")
 		.replace(/src="search\.js"/g, `src="${cdnBase}search.js"`);
 
 	converted = converted.replace(
