@@ -630,11 +630,11 @@
         const luminDirectoryCacheKey = "aether:lumin-directory:v2";
         const isStaticSvgPage = window.location.protocol === "data:" || window.location.origin === "null";
 const gnMathZonesUrls = [
-            "https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json",
-            "https://raw.githubusercontent.com/gn-math/assets/main/zones.json"
+            "https://raw.githubusercontent.com/gn-math/assets/main/zones.json",
+            "https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json"
         ];
-        const gnMathCoverUrl = "https://cdn.jsdelivr.net/gh/gn-math/covers@main";
-        const gnMathHtmlUrl = "https://cdn.jsdelivr.net/gh/gn-math/html@main";
+        const gnMathCoverUrl = "https://raw.githubusercontent.com/gn-math/covers/main";
+        const gnMathHtmlUrl = "https://raw.githubusercontent.com/gn-math/html/main";
 
         const fallbackGames = [
             { id: "play-2048", name: "2048", category: "Puzzle", url: "https://play2048.co/" },
@@ -729,7 +729,13 @@ const gnMathZonesUrls = [
         async function loadGnMathGames() {
             const zones = await fetchJsonFromAny(gnMathZonesUrls);
             return zones
-                .filter((zone) => zone?.id !== undefined && zone?.name && zone?.url)
+                .filter((zone) => {
+                    if (zone?.id === undefined || !zone?.name || !zone?.url) return false;
+                    const url = String(zone.url)
+                        .replaceAll("{HTML_URL}", gnMathHtmlUrl)
+                        .toLowerCase();
+                    return url.endsWith(".html");
+                })
                 .map(normalizeGnMathZone);
         }
 
@@ -1006,6 +1012,10 @@ const gnMathZonesUrls = [
 
         async function openHtmlGame(game) {
             setStatus(`Opening ${game.name}...`);
+            const gameWindow = isStaticSvgPage ? window.open("about:blank", "_blank") : null;
+            if (gameWindow) {
+                gameWindow.opener = null;
+            }
 
             try {
                 const response = await fetch(game.html_url);
@@ -1019,10 +1029,29 @@ const gnMathZonesUrls = [
                 }
 
                 const blob = new Blob([html], { type: "text/html" });
-                window.location.href = URL.createObjectURL(blob);
+                const gameUrl = URL.createObjectURL(blob);
+                if (isStaticSvgPage) {
+                    if (gameWindow) {
+                        gameWindow.location.href = gameUrl;
+                    } else {
+                        window.open(gameUrl, "_blank");
+                    }
+                    setStatus("Opened game in a new tab.");
+                } else {
+                    window.location.href = gameUrl;
+                }
             } catch (err) {
                 console.error("GN Math game launch failed:", err);
-                window.location.href = `research.html?goto=${encodeURIComponent(game.html_url)}`;
+                if (isStaticSvgPage) {
+                    if (gameWindow) {
+                        gameWindow.location.href = game.html_url;
+                    } else {
+                        window.open(game.html_url, "_blank");
+                    }
+                    setStatus("Opened game in a new tab.");
+                } else {
+                    window.location.href = `research.html?goto=${encodeURIComponent(game.html_url)}`;
+                }
             }
         }
 

@@ -677,6 +677,7 @@ function initAetherResearch() {
     let legacyWorkersChecked = false;
     let scramjetReadyPromise = null;
     let scramjetController = null;
+    let sandstoneModulePromise = null;
     let loadToken = 0;
     const isStaticSvgPage = window.location.protocol === "data:" || window.location.origin === "null";
 
@@ -775,6 +776,7 @@ function initAetherResearch() {
             tabEl,
             iframeEl,
             frame: null,
+            sandstoneFrame: null,
             hasLoadedUrl: false,
             currentUrl: "",
             rawInput: ""
@@ -914,6 +916,36 @@ function initAetherResearch() {
         return init(JSON.parse(configText));
     }
 
+    async function loadSandstoneModule() {
+        if (!sandstoneModulePromise) {
+            sandstoneModulePromise = import("https://cdn.jsdelivr.net/npm/sandstone-proxy@0.2.0/dist/sandstone.mjs").then((module) => {
+                module.libcurl.set_websocket("wss://wisp.mercurywork.shop/");
+                return module;
+            });
+        }
+        return sandstoneModulePromise;
+    }
+
+    async function prepareSandstoneFrame(tab) {
+        const sandstone = await withTimeout(
+            loadSandstoneModule(),
+            20000,
+            "Sandstone took too long to load."
+        );
+
+        if (!tab.sandstoneFrame) {
+            const proxyFrame = new sandstone.controller.ProxyFrame();
+            proxyFrame.iframe.className = "web-viewport";
+            proxyFrame.iframe.style.display = "none";
+            proxyFrame.iframe.setAttribute("allow", "autoplay; fullscreen; gamepad; microphone; camera; clipboard-read; clipboard-write");
+            viewportsContainer.replaceChild(proxyFrame.iframe, tab.iframeEl);
+            tab.iframeEl = proxyFrame.iframe;
+            tab.sandstoneFrame = proxyFrame;
+        }
+
+        return tab.sandstoneFrame;
+    }
+
     async function prepareScramjet() {
         if (scramjetReadyPromise) return scramjetReadyPromise;
 
@@ -978,9 +1010,26 @@ function initAetherResearch() {
             assertValidUrl(url);
 
             errorEl.textContent = "Loading...";
-            const controller = await prepareScramjet();
-            if (!tab.frame) {
-                tab.frame = controller.createFrame(tab.iframeEl);
+
+            if (isStaticSvgPage) {
+                const frame = await prepareSandstoneFrame(tab);
+                await withTimeout(
+                    frame.navigate_to(url),
+                    30000,
+                    "Sandstone took too long to open the page."
+                );
+                clearTimeout(loadTimer);
+                loadTimer = null;
+                if (token === loadToken && errorEl.textContent === "Loading...") {
+                    errorEl.textContent = "";
+                }
+            } else {
+                const controller = await prepareScramjet();
+                if (!tab.frame) {
+                    tab.frame = controller.createFrame(tab.iframeEl);
+                }
+
+                tab.frame.go(url);
             }
 
             tab.iframeEl.onload = () => {
@@ -999,7 +1048,6 @@ function initAetherResearch() {
                 setLoadingError(token, "Still loading. This site may be blocking the proxy or taking too long.");
             }, 15000);
 
-            tab.frame.go(url);
             tab.hasLoadedUrl = true;
             tab.currentUrl = url;
             tab.rawInput = input;
@@ -1017,6 +1065,9 @@ function initAetherResearch() {
             clearTimeout(loadTimer);
             scramjetReadyPromise = null;
             scramjetController = null;
+            if (isStaticSvgPage) {
+                sandstoneModulePromise = null;
+            }
             tab.hasLoadedUrl = false;
             render();
             errorEl.textContent = "Error: " + err.message;
