@@ -18,7 +18,8 @@ function convertStaticPaths(html) {
 		.replace(/aether-favicon\.png/g, faviconImage)
 		.replace(/\s*<script src="page-loader\.js"><\/script>/g, "")
 		.replace(/\s*<script src="\/bootstrap-init\.js"><\/script>/g, "")
-		.replace(/src="search\.js"/g, `src="${cdnBase}search.js"`);
+		.replace(/src="search\.js"/g, `src="${cdnBase}search.js"`)
+		.replace(/src="gust\/site\.svg"/g, `src="${cdnBase}gust/site.svg"`);
 
 	converted = converted.replace(
 		new RegExp(`<button([^>]*?)onclick="window\\.location\\.href='(${navPages})\\.html'"([^>]*)>([\\s\\S]*?)<\\/button>`, "g"),
