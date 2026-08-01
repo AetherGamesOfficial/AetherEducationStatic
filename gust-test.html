@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUST Test</title>
+    <link rel="icon" type="image/png" href="aether-favicon.png">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #121212 url("aether background.png") center / cover fixed no-repeat;
+            color: white;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        .gust-frame {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #121212;
+        }
+
+        .aether-return {
+            position: fixed;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: inline-flex;
+            align-items: center;
+            gap: 18px;
+            padding: 10px 28px;
+            border: 4px solid white;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .homebutton {
+            position: relative;
+            width: 56px;
+            height: 52px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .home-icon {
+            position: relative;
+            display: block;
+            width: 38px;
+            height: 34px;
+            margin: 8px auto;
+        }
+
+        .home-icon::before {
+            content: "";
+            position: absolute;
+            left: 4px;
+            top: 12px;
+            width: 30px;
+            height: 22px;
+            background: white;
+            clip-path: polygon(0 0, 50% 0, 100% 0, 100% 100%, 63% 100%, 63% 54%, 37% 54%, 37% 100%, 0 100%);
+        }
+
+        .home-icon::after {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 0;
+            width: 34px;
+            height: 28px;
+            background: white;
+            clip-path: polygon(50% 0, 100% 58%, 90% 68%, 50% 24%, 10% 68%, 0 58%);
+        }
+    </style>
+</head>
+<body>
+    <iframe
+        class="gust-frame"
+        src="https://cdn.jsdelivr.net/gh/nautilus-os/GUST@main/svg/site.svg"
+        allow="autoplay; fullscreen; pointer-lock; gamepad; clipboard-read; clipboard-write"
+        allowfullscreen>
+    </iframe>
+
+    <nav class="aether-return">
+        <button class="homebutton" type="button" title="Aether Home" aria-label="Aether Home" onclick="window.location.href='studyhub.html'">
+            <span class="home-icon"></span>
+        </button>
+    </nav>
+</body>
+</html>
