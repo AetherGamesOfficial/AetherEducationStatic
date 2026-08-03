@@ -3,7 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 const repo = process.argv[2] || "AetherGamesOfficial/AetherEducationStatic";
 const cdnBase = `https://cdn.jsdelivr.net/gh/${repo}@main/`;
 const buildStamp = "favicon-refresh-20260721";
-const pages = ["studyhub", "enrichment", "resources", "research", "settings", "loading", "gust-test"];
+const pages = ["studyhub", "enrichment", "resources", "research", "settings", "loading", "arctic-test"];
 const navPages = "studyhub|enrichment|resources|research|settings";
 const shellBackground = `${cdnBase}aether%20background.png`;
 const faviconImage = `${cdnBase}aether-favicon.png`;
@@ -19,7 +19,6 @@ function convertStaticPaths(html) {
 		.replace(/\s*<script src="page-loader\.js"><\/script>/g, "")
 		.replace(/\s*<script src="\/bootstrap-init\.js"><\/script>/g, "")
 		.replace(/src="search\.js"/g, `src="${cdnBase}search.js"`)
-		.replace(/src="gust\/site\.svg"/g, `src="${cdnBase}gust/site.svg"`);
 
 	converted = converted.replace(
 		new RegExp(`<button([^>]*?)onclick="window\\.location\\.href='(${navPages})\\.html'"([^>]*)>([\\s\\S]*?)<\\/button>`, "g"),

@@ -426,6 +426,40 @@
             font-family: inherit;
         }
 
+        .proxy-url-form {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            z-index: 45;
+            width: min(860px, calc(100vw - 42px));
+            transform: translateX(-50%);
+            display: none;
+        }
+
+        .proxy-url-form.active {
+            display: block;
+        }
+
+        #proxy-url {
+            width: 100%;
+            min-height: 48px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 4px solid white;
+            border-radius: 24px;
+            padding: 10px 18px;
+            box-sizing: border-box;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        #proxy-url::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
         .web-viewport {
             position: absolute;
             inset: 0;
@@ -603,6 +637,16 @@
 
         </div>
 
+        <form class="proxy-url-form" id="proxy-url-form" onsubmit="return false">
+            <input
+                id="proxy-url"
+                type="text"
+                placeholder="Search the web or type a URL..."
+                autocomplete="off"
+                spellcheck="false"
+            />
+        </form>
+
         <div
             id="viewports-container"
             style="
@@ -656,17 +700,38 @@
         </div>
 
     </div>
-
- 
-<script src="/bootstrap-init.js"></script>
 <script type="module">
 function initAetherResearch() {
 
     const toolTargetKey = "aether-tool-target";
+    const arcticBases = [
+        "https://cdn.jsdelivr.net/gh/sealiee11/arctic-static@main",
+        "https://testingcf.jsdelivr.net/gh/sealiee11/arctic-static@main",
+        "https://gcore.jsdelivr.net/gh/sealiee11/arctic-static@main",
+        "https://fastly.jsdelivr.net/gh/sealiee11/arctic-static@main",
+        "https://originfastly.jsdelivr.net/gh/sealiee11/arctic-static@main",
+        "https://quantil.jsdelivr.net/gh/sealiee11/arctic-static@main"
+    ];
+
+    function encodeArcticTarget(value) {
+        const bytes = new TextEncoder().encode(value);
+        let text = "";
+        for (const byte of bytes) text += String.fromCharCode(byte);
+        return "aw1." + btoa(text).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+
+    function getArcticUrl(target, baseIndex = 0) {
+        const base = arcticBases[baseIndex % arcticBases.length].replace(/\/+$/, "");
+        return base + "/embed.svg?backend=scramjet2&palette=gnmath#" + encodeArcticTarget(target);
+    }
+
     const form = document.getElementById("uv-form");
     const address = document.getElementById("uv-address");
     const landingUi = document.getElementById("landing-ui");
     const errorEl = document.getElementById("uv-error");
+    const activeUrlForm = document.getElementById("proxy-url-form");
+    const activeUrl = document.getElementById("proxy-url");
+    const mainWorkspace = document.querySelector(".main-workspace");
 
     const tabBar = document.getElementById("tab-bar");
     const newTabBtn = document.getElementById("new-tab-btn");
@@ -721,8 +786,10 @@ function initAetherResearch() {
         const hasPage = !!tab?.hasLoadedUrl;
 
         landingUi.style.display = hasPage ? "none" : "flex";
-        homeNav.style.display = hasPage ? "none" : "flex";
+        homeNav.style.display = "flex";
         address.value = hasPage ? (tab.rawInput || tab.currentUrl) : "";
+        activeUrlForm.classList.toggle("active", hasPage);
+        activeUrl.value = hasPage ? (tab.rawInput || tab.currentUrl) : "";
 
         for (const t of tabs) {
             const isActive = t.id === activeTabId;
@@ -994,43 +1061,28 @@ function initAetherResearch() {
         errorEl.textContent = message;
     }
 
-    async function loadAddress() {
+    async function loadAddress(rawValue) {
 
         const tab = getActiveTab();
         if (!tab) return;
 
-        const input = address.value.trim();
+        const sourceValue = rawValue ?? (document.activeElement === activeUrl ? activeUrl.value : address.value);
+        const input = String(sourceValue || "").trim();
         if (!input) return;
 
         const url = formatUrl(input);
         const token = ++loadToken;
         let loadTimer = null;
+        let baseIndex = 0;
+
+        function loadArcticFrame() {
+            tab.iframeEl.src = getArcticUrl(url, baseIndex);
+        }
 
         try {
             assertValidUrl(url);
 
             errorEl.textContent = "Loading...";
-
-            if (isStaticSvgPage) {
-                const frame = await prepareSandstoneFrame(tab);
-                await withTimeout(
-                    frame.navigate_to(url),
-                    30000,
-                    "Sandstone took too long to open the page."
-                );
-                clearTimeout(loadTimer);
-                loadTimer = null;
-                if (token === loadToken && errorEl.textContent === "Loading...") {
-                    errorEl.textContent = "";
-                }
-            } else {
-                const controller = await prepareScramjet();
-                if (!tab.frame) {
-                    tab.frame = controller.createFrame(tab.iframeEl);
-                }
-
-                tab.frame.go(url);
-            }
 
             tab.iframeEl.onload = () => {
                 if (token !== loadToken) return;
@@ -1039,7 +1091,15 @@ function initAetherResearch() {
                     errorEl.textContent = "";
                 }
             };
+
             tab.iframeEl.onerror = () => {
+                if (token !== loadToken) return;
+                if (baseIndex < arcticBases.length - 1) {
+                    baseIndex += 1;
+                    errorEl.textContent = "Loading...";
+                    loadArcticFrame();
+                    return;
+                }
                 clearTimeout(loadTimer);
                 setLoadingError(token, "Site blocked or failed to load.");
             };
@@ -1048,9 +1108,11 @@ function initAetherResearch() {
                 setLoadingError(token, "Still loading. This site may be blocking the proxy or taking too long.");
             }, 15000);
 
+            loadArcticFrame();
             tab.hasLoadedUrl = true;
             tab.currentUrl = url;
             tab.rawInput = input;
+            activeUrl.value = input;
 
             const domain = url
                 .replace(/^https?:\/\/(www\.)?/, "")
@@ -1063,11 +1125,6 @@ function initAetherResearch() {
 
         } catch (err) {
             clearTimeout(loadTimer);
-            scramjetReadyPromise = null;
-            scramjetController = null;
-            if (isStaticSvgPage) {
-                sandstoneModulePromise = null;
-            }
             tab.hasLoadedUrl = false;
             render();
             errorEl.textContent = "Error: " + err.message;
@@ -1076,7 +1133,12 @@ function initAetherResearch() {
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        await loadAddress();
+        await loadAddress(address.value);
+    });
+
+    activeUrlForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        await loadAddress(activeUrl.value);
     });
 
     address.addEventListener("keydown", async (e) => {
@@ -1093,7 +1155,7 @@ function initAetherResearch() {
         try { try { sessionStorage.removeItem(toolTargetKey); } catch {} } catch {}
         address.value = goto;
         window.history.replaceState(null, "", window.location.pathname);
-        loadAddress();
+        loadAddress(goto);
     }
 
 }
