@@ -1077,13 +1077,43 @@ function initAetherResearch() {
         let baseIndex = 0;
 
         function loadArcticFrame() {
+            tab.iframeEl.dataset.loadToken = String(token);
+            tab.iframeEl.dataset.baseIndex = String(baseIndex);
             tab.iframeEl.src = getArcticUrl(url, baseIndex);
+        }
+
+        function tryNextArcticBase(message) {
+            if (token !== loadToken) return false;
+            if (baseIndex >= arcticBases.length - 1) return false;
+            baseIndex += 1;
+            errorEl.textContent = message || "Trying another route...";
+            loadArcticFrame();
+            return true;
+        }
+
+        function onArcticMessage(event) {
+            const data = event.data;
+            if (!data || data.type !== "arctic-embed") return;
+            if (data.status === "ready") {
+                clearTimeout(loadTimer);
+                if (token === loadToken) errorEl.textContent = "";
+                window.removeEventListener("message", onArcticMessage);
+                return;
+            }
+            if (data.status === "error") {
+                if (!tryNextArcticBase("Trying another route...")) {
+                    clearTimeout(loadTimer);
+                    setLoadingError(token, "Could not load that page.");
+                    window.removeEventListener("message", onArcticMessage);
+                }
+            }
         }
 
         try {
             assertValidUrl(url);
 
             errorEl.textContent = "Loading...";
+            window.addEventListener("message", onArcticMessage);
 
             tab.iframeEl.onload = () => {
                 if (token !== loadToken) return;
@@ -1125,6 +1155,7 @@ function initAetherResearch() {
             render();
 
         } catch (err) {
+            window.removeEventListener("message", onArcticMessage);
             clearTimeout(loadTimer);
             tab.hasLoadedUrl = false;
             render();
