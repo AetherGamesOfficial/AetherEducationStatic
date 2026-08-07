@@ -713,6 +713,10 @@ function initAetherResearch() {
         "https://originfastly.jsdelivr.net/gh/sealiee11/arctic-static@main",
         "https://quantil.jsdelivr.net/gh/sealiee11/arctic-static@main"
     ];
+    const arcticWisps = [
+        "wss://wisp.mercurywork.shop/",
+        ""
+    ];
 
     function encodeArcticTarget(value) {
         const bytes = new TextEncoder().encode(value);
@@ -722,8 +726,13 @@ function initAetherResearch() {
     }
 
     function getArcticUrl(target, baseIndex = 0) {
-        const base = arcticBases[baseIndex % arcticBases.length].replace(/\/+$/, "");
-        return base + "/embed.svg?backend=scramjet2&palette=gnmath#" + encodeArcticTarget(target);
+        const routeCount = arcticBases.length * arcticWisps.length;
+        const routeIndex = baseIndex % routeCount;
+        const base = arcticBases[Math.floor(routeIndex / arcticWisps.length) % arcticBases.length].replace(/\/+$/, "");
+        const params = new URLSearchParams({ backend: "scramjet2", palette: "gnmath" });
+        const wisp = arcticWisps[routeIndex % arcticWisps.length];
+        if (wisp) params.set("wisp", wisp);
+        return base + "/embed.svg?" + params.toString() + "#" + encodeArcticTarget(target);
     }
 
     const form = document.getElementById("uv-form");
@@ -1084,7 +1093,7 @@ function initAetherResearch() {
 
         function tryNextArcticBase(message) {
             if (token !== loadToken) return false;
-            if (baseIndex >= arcticBases.length - 1) return false;
+            if (baseIndex >= (arcticBases.length * arcticWisps.length) - 1) return false;
             baseIndex += 1;
             errorEl.textContent = message || "Trying another route...";
             loadArcticFrame();
@@ -1125,7 +1134,7 @@ function initAetherResearch() {
 
             tab.iframeEl.onerror = () => {
                 if (token !== loadToken) return;
-                if (baseIndex < arcticBases.length - 1) {
+                if (baseIndex < (arcticBases.length * arcticWisps.length) - 1) {
                     baseIndex += 1;
                     errorEl.textContent = "Loading...";
                     loadArcticFrame();
