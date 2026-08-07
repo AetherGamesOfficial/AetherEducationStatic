@@ -731,7 +731,7 @@ function initAetherResearch() {
         const params = new URLSearchParams({ backend: "scramjet2", palette: "gnmath" });
         const wisp = arcticWisps[routeIndex % arcticWisps.length];
         if (wisp) params.set("wisp", wisp);
-        return base + "/embed.svg?" + params.toString() + "#" + encodeArcticTarget(target);
+        return base + "/embed.html?" + params.toString() + "#" + encodeArcticTarget(target);
     }
 
     const form = document.getElementById("uv-form");
