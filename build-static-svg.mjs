@@ -19,6 +19,7 @@ function convertStaticPaths(html) {
 		.replace(/\s*<script src="page-loader\.js"><\/script>/g, "")
 		.replace(/\s*<script src="\/bootstrap-init\.js"><\/script>/g, "")
 		.replace(/src="search\.js"/g, `src="${cdnBase}search.js"`)
+		.replace(/__AETHER_STATIC_CDN_BASE__/g, cdnBase)
 
 	converted = converted.replace(
 		new RegExp(`<button([^>]*?)onclick="window\\.location\\.href='(${navPages})\\.html'"([^>]*)>([\\s\\S]*?)<\\/button>`, "g"),

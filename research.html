@@ -717,6 +717,12 @@ function initAetherResearch() {
         "wss://wisp.mercurywork.shop/"
     ];
 
+    const staticCdnBase = "__AETHER_STATIC_CDN_BASE__";
+
+    function getStaticAssetUrl(file) {
+        return staticCdnBase.startsWith("http") ? staticCdnBase + file : file;
+    }
+
     function encodeArcticTarget(value) {
         const bytes = new TextEncoder().encode(value);
         let text = "";
@@ -725,13 +731,12 @@ function initAetherResearch() {
     }
 
     function getArcticUrl(target, baseIndex = 0) {
-        const routeCount = arcticBases.length * arcticWisps.length;
+        const routeCount = arcticWisps.length;
         const routeIndex = baseIndex % routeCount;
-        const base = arcticBases[Math.floor(routeIndex / arcticWisps.length) % arcticBases.length].replace(/\/+$/, "");
         const params = new URLSearchParams({ backend: "scramjet2", palette: "gnmath" });
-        const wisp = arcticWisps[routeIndex % arcticWisps.length];
+        const wisp = arcticWisps[routeIndex];
         if (wisp) params.set("wisp", wisp);
-        return base + "/embed.html?" + params.toString() + "#" + encodeArcticTarget(target);
+        return getStaticAssetUrl("static-scramjet.html") + "?" + params.toString() + "#" + encodeArcticTarget(target);
     }
 
     const form = document.getElementById("uv-form");
@@ -1092,7 +1097,7 @@ function initAetherResearch() {
 
         function tryNextArcticBase(message) {
             if (token !== loadToken) return false;
-            if (baseIndex >= (arcticBases.length * arcticWisps.length) - 1) return false;
+            if (baseIndex >= (arcticWisps.length) - 1) return false;
             baseIndex += 1;
             errorEl.textContent = message || "Trying another route...";
             loadArcticFrame();
@@ -1133,7 +1138,7 @@ function initAetherResearch() {
 
             tab.iframeEl.onerror = () => {
                 if (token !== loadToken) return;
-                if (baseIndex < (arcticBases.length * arcticWisps.length) - 1) {
+                if (baseIndex < (arcticWisps.length) - 1) {
                     baseIndex += 1;
                     errorEl.textContent = "Loading...";
                     loadArcticFrame();
