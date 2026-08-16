@@ -755,7 +755,7 @@ function initAetherResearch() {
             "window.__AETHER_STATIC_WISP__=" + JSON.stringify(launch.wisp).replace(/</g, "\\u003c") + ";" +
             "window.__AETHER_STATIC_BACKEND__=" + JSON.stringify(launch.backend).replace(/</g, "\\u003c") + ";" +
             "window.__AETHER_STATIC_TARGET_HASH__=" + JSON.stringify(launch.hash).replace(/</g, "\\u003c") + ";" +
-            "<\\/script>";
+            "<" + "/script>";
         source = /<\/head>/i.test(source) ? source.replace(/<\/head>/i, inject + "</head>") : inject + source;
 
         frame.removeAttribute("srcdoc");
