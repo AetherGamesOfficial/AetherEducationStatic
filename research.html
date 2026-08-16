@@ -758,8 +758,8 @@ function initAetherResearch() {
             "<\\/script>";
         source = /<\/head>/i.test(source) ? source.replace(/<\/head>/i, inject + "</head>") : inject + source;
 
-        frame.removeAttribute("src");
-        frame.srcdoc = source;
+        frame.removeAttribute("srcdoc");
+        frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(source);
     }
 
     const form = document.getElementById("uv-form");
@@ -916,45 +916,13 @@ function initAetherResearch() {
         errorEl.textContent = message;
     }
 
-    function getLoaderPageUrl() {
-        const launchHref = String(window.__AETHER_LAUNCH_HREF__ || window.location.href || "");
-        const isStatic = launchHref.includes("/gh/AetherGamesOfficial/") || launchHref.includes("research.svg");
-        return isStatic ? getStaticAssetUrl("loading.svg") : "loading.html";
-    }
-
     function showPageLoader() {
-        let loader = document.getElementById("page-loader");
-        if (loader) {
-            loader.style.opacity = "1";
-            return loader;
-        }
-
-        loader = document.createElement("iframe");
-        loader.id = "page-loader";
-        loader.title = "Loading";
-        loader.src = getLoaderPageUrl();
-        loader.setAttribute("aria-hidden", "true");
-        loader.style.cssText = [
-            "position:fixed",
-            "inset:0",
-            "width:100vw",
-            "height:100vh",
-            "border:0",
-            "z-index:2147483646",
-            "background:#000",
-            "opacity:1",
-            "transition:opacity 520ms ease",
-            "pointer-events:auto"
-        ].join(";");
-        document.body.appendChild(loader);
-        return loader;
+        return null;
     }
 
     function hidePageLoader() {
         const loader = document.getElementById("page-loader");
-        if (!loader) return;
-        loader.style.opacity = "0";
-        window.setTimeout(() => loader.remove(), 560);
+        if (loader) loader.remove();
     }
 
     async function loadAddress(rawValue) {
