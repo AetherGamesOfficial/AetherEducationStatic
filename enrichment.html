@@ -680,7 +680,7 @@
             { id: "freerice", name: "FreeRice", category: "Trivia", url: "https://freerice.com/" },
         ];
 
-        const staticCdnBase = "https://cdn.jsdelivr.net/gh/AetherGamesOfficial/Aetherhtmlstatic@main/";
+        const staticCdnBase = "https://cdn.jsdelivr.net/gh/AetherGamesOfficial/AetherEducationStatic@main/";
 
         function getStaticPageUrl(page) {
             let parentHref = "";
@@ -689,8 +689,12 @@
             } catch {}
 
             const currentHref = [window.location.href, document.referrer, parentHref].join(" ");
-            const isStatic = currentHref.includes("/gh/AetherGamesOfficial/Aetherhtmlstatic@") || currentHref.includes(".svg");
+            const isStatic = currentHref.includes("/gh/AetherGamesOfficial/") || currentHref.includes(".svg");
             return isStatic ? staticCdnBase + page.replace(/\.html$/, ".svg") : page;
+        }
+
+        function getLoadingHandoffUrl(destination) {
+            return `${getStaticPageUrl("loading.html")}?next=${encodeURIComponent(destination)}`;
         }
 
         function unwrapLaunchTarget(value) {
@@ -1036,13 +1040,13 @@
 
         function openInResearch(url) {
             if (!url) return;
-            showGameLoader();
             const target = unwrapLaunchTarget(url);
             const destination = `${getStaticPageUrl("research.html")}?goto=${encodeURIComponent(target)}`;
+            const handoff = getLoadingHandoffUrl(destination);
             try {
-                window.parent.location.href = destination;
+                window.parent.location.href = handoff;
             } catch {
-                window.location.href = destination;
+                window.location.href = handoff;
             }
         }
 

@@ -538,6 +538,23 @@
     <script>
         const toolTargetKey = "aether-tool-target";
 
+        function getStaticPageUrl(page) {
+            let parentHref = "";
+            try {
+                parentHref = window.parent && window.parent !== window ? window.parent.location.href : "";
+            } catch {}
+
+            const currentHref = [window.location.href, document.referrer, parentHref].join(" ");
+            const isStatic = currentHref.includes("/gh/AetherGamesOfficial/") || currentHref.includes(".svg");
+            return isStatic
+                ? `https://cdn.jsdelivr.net/gh/AetherGamesOfficial/AetherEducationStatic@main/${page.replace(/\.html$/, ".svg")}`
+                : page;
+        }
+
+        function getLoadingHandoffUrl(destination) {
+            return `${getStaticPageUrl("loading.html")}?next=${encodeURIComponent(destination)}`;
+        }
+
         document.querySelectorAll(".tool-tab").forEach((button) => {
             button.addEventListener("click", () => {
                 const url = button.dataset.url;
@@ -546,7 +563,8 @@
                     return;
                 }
                 try { sessionStorage.setItem(toolTargetKey, url); } catch {}
-                window.location.href = `research.html?goto=${encodeURIComponent(url)}`;
+                const destination = `${getStaticPageUrl("research.html")}?goto=${encodeURIComponent(url)}`;
+                window.location.href = getLoadingHandoffUrl(destination);
             });
         });
     </script>

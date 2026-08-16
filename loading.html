@@ -192,5 +192,35 @@ showNextMessage();
 setInterval(showNextMessage, 2600);
 </script>
 
+
+<script>
+function getLoadingNextUrl() {
+    const sources = [];
+    if (typeof window.__AETHER_LAUNCH_HREF__ === "string") sources.push(window.__AETHER_LAUNCH_HREF__);
+    try { sources.push(window.parent.location.href); } catch {}
+    sources.push(window.location.href);
+
+    for (const source of sources) {
+        try {
+            const url = new URL(source, window.location.href);
+            const next = url.searchParams.get("next") || url.searchParams.get("to");
+            if (next) return next;
+        } catch {}
+    }
+    return "";
+}
+
+const loadingNextUrl = getLoadingNextUrl();
+if (loadingNextUrl) {
+    window.setTimeout(() => {
+        try {
+            window.parent.location.href = loadingNextUrl;
+        } catch {
+            window.location.href = loadingNextUrl;
+        }
+    }, 1400);
+}
+</script>
+
 </body>
 </html>
