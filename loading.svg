@@ -19,7 +19,7 @@
       frame.setAttribute("allow", "autoplay; fullscreen; pointer-lock; gamepad");
       frame.setAttribute("allowfullscreen", "true");
       frame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:0;margin:0;padding:0;display:block;background:#121212 url('https://cdn.jsdelivr.net/gh/AetherGamesOfficial/AetherEducationStatic@main/aether%20background.png') center / cover no-repeat;";
-      frame.srcdoc = framedHtml;
+      frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(framedHtml);
       document.getElementById("loading-frame-root").appendChild(frame);
     })();
   ]]></script>
